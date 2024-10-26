@@ -669,8 +669,6 @@ public class OpenAiService {
         } catch (TimeoutException e) {
             future.cancel(true);
             throw new TimeoutException("Request timed out after " + timeout + " ms");
-        } catch (InterruptedException | ExecutionException e) {
-            throw e;
         }
     }
 
