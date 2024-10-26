@@ -63,8 +63,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class OpenAiService {
 
@@ -657,6 +656,22 @@ public class OpenAiService {
     public BillingUsage billingUsage(@NotNull LocalDate starDate, @NotNull LocalDate endDate) {
         Single<BillingUsage> billingUsage = api.billingUsage(starDate, endDate);
         return billingUsage.blockingGet();
+    }
+
+    public ChatCompletionResult createCompletionWithTimeout(final ChatCompletionRequest request, final long timeout) throws Exception {
+        return executeWithTimeout(() -> api.createChatCompletion(request).blockingGet(), timeout);
+    }
+
+    private <T> T executeWithTimeout(final Callable<T> task, final long timeout) throws Exception {
+        Future<T> future = executorService.submit(task);
+        try {
+            return future.get(timeout, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            throw new TimeoutException("Request timed out after " + timeout + " ms");
+        } catch (InterruptedException | ExecutionException e) {
+            throw e;
+        }
     }
 
 }

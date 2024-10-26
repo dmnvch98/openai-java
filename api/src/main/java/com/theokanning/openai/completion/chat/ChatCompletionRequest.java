@@ -1,6 +1,7 @@
 package com.theokanning.openai.completion.chat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -106,6 +107,9 @@ public class ChatCompletionRequest {
     @JsonProperty("function_call")
     ChatCompletionRequestFunctionCall functionCall;
 
+    @JsonProperty("response_format")
+    private JsonSchemaResponseFormat responseFormat;
+
     @Data
     @Builder
     @AllArgsConstructor
@@ -116,6 +120,19 @@ public class ChatCompletionRequest {
         public static ChatCompletionRequestFunctionCall of(String name) {
             return new ChatCompletionRequestFunctionCall(name);
         }
+
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class JsonSchemaResponseFormat {
+
+        private final String type = "json_schema";
+
+        @JsonProperty("json_schema")
+        private JsonNode jsonSchema;
 
     }
 }
